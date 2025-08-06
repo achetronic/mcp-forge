@@ -1,0 +1,97 @@
+name: Compile into binaries
+
+on:
+  release:
+    types: [created]
+
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release tag where to create the binaries (as SemVer vX.X.X)'
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel:
+        # linux/386, linux/amd64, linux/arm64, darwin/amd64, darwin/arm64
+        goos: [linux, darwin]
+        goarch: ["386", amd64, arm64]
+        exclude:
+          - goos: darwin
+            goarch: "386"
+
+    steps:
+      - id: read_tag
+        name: "Read release tag name (mostly vx.x.x)"
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            export TAG="${{ github.ref_name }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            export TAG="${{ inputs.release }}"
+          fi
+
+          echo "release_tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.read_tag.outputs.release_tag }}
+
+      - name: "Read Go version from go.mod"
+        id: read_go_version
+        run: |
+          go_version_raw=$(grep "^go " go.mod | awk '{print $2}')
+          echo "go_version=${go_version_raw}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '${{ steps.read_go_version.outputs.go_version }}'
+
+      - name: "Build binary"
+        id: build_binary
+        run: |
+          printf "GOOS: %s, GOARCH: %s\n" "${{ matrix.goos }}" "${{ matrix.goarch }}"
+
+          export GOOS=${{ matrix.goos }}
+          export GOARCH=${{ matrix.goarch }}
+          export VERSION=${{ steps.read_tag.outputs.release_tag }}
+
+          make build
+
+      - name: "Craft package and its signature"
+        id: build_package
+        run: |
+          export GOOS=${{ matrix.goos }}
+          export GOARCH=${{ matrix.goarch }}
+          export PACKAGE_NAME=tiny-mcp-${{ steps.read_tag.outputs.release_tag }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+
+          make package
+          make package-signature
+
+          echo "package_name=${PACKAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: "Upload package to release"
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/${{ steps.build_package.outputs.package_name }}
+          asset_name: ${{ steps.build_package.outputs.package_name }}
+          tag: ${{ steps.read_tag.outputs.release_tag }}
+          overwrite: true
+
+      - name: "Upload package signature to release"
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/${{ steps.build_package.outputs.package_name }}.md5
+          asset_name: ${{ steps.build_package.outputs.package_name }}.md5
+          tag: ${{ steps.read_tag.outputs.release_tag }}
+          overwrite: true

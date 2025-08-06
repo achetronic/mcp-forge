@@ -1,0 +1,80 @@
+name: Build Docker image
+
+on:
+  release:
+    types: [created]
+
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release tag where to create the binaries (as SemVer vX.X.X)'
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - id: read_tag
+        name: Read release tag name (mostly vx.x.x)
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            export TAG="${{ github.ref_name }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            export TAG="${{ inputs.release }}"
+          fi
+
+          echo "release_tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.read_tag.outputs.release_tag }}
+
+      - name: Read Go version from go.mod
+        id: read_go_version
+        run: |
+          go_version_raw=$(grep "^go " go.mod | awk '{print $2}')
+          echo "go_version=${go_version_raw}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '${{ steps.read_go_version.outputs.go_version }}'
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: build
+        name: Build and push Docker images
+        env:
+          RELEASE_TAG: ${{ steps.read_tag.outputs.release_tag }}
+        run: |
+          export IMG="ghcr.io/$GITHUB_REPOSITORY:$RELEASE_TAG"        
+  
+          if grep -q '^docker-buildx:' Makefile; then
+            make docker-buildx
+          else
+            make docker-build
+            make docker-push
+          fi
+
