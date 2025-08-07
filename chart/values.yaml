@@ -5,10 +5,9 @@
 app-template:
 
   defaultPodOptions:
+    labels: {}
     annotations:
       sidecar.istio.io/inject: "true"
-
-    labels: {}
 
   controllers:
 
@@ -27,6 +26,10 @@ app-template:
             tag: latest
             pullPolicy: Always
 
+          args:
+            - --config
+            - /data/config.yaml
+
           resources:
             requests:
               memory: "512Mi"
@@ -34,10 +37,7 @@ app-template:
             limits:
               memory: "512Mi"
 
-          envFrom:
-            - configMapRef:
-                identifier: configuration
-                
+          envFrom: []
             # Uncomment this if the related section is enabled in 'rawResources'
             #- secretRef:
             #    name: "{{ .Release.Name }}-credentials"
@@ -47,37 +47,68 @@ app-template:
       enabled: true
       annotations: {}
       data:
-        # Params related to the server
-        SERVER_NAME: "MCP Server Template"
-        SERVER_VERSION: "0.1.0"
-        SERVER_TRANSPORT: http # Values: stdio, http
-        SERVER_TRANSPORT_HTTP_HOST: ':8080'
+        config.yaml: |
+          # MCP Server Configuration
+          server:
+            name: "MCP Server Template"
+            version: "0.1.0"
+            transport:
+              type: "http"
+              http:
+                host: ":8080"
+          
+          # Middleware Configuration
+          middleware:
+            jwt:
+              enabled: true
+              validation:
+                strategy: "forwarded"  # Values: 'local' or 'forwarded'
+                # JWT forwarded by upstream proxy (Istio, etc.)
+                # Ref: https://istio.io/latest/docs/reference/config/security/request_authentication/#JWTRule-output_payload_to_header
+                forwarded_header: "X-Validated-Jwt"
+                local:
+                  jwks_uri: &JwksUri "https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs"
+                  cache_interval: "10s"
+          
+          # OAuth Protected Resource Configuration
+          # Endpoint: /.well-known/oauth-protected-resource
+          oauth_protected_resource:
+            enabled: true
+            resource: "https://mcp-server-template.example.com"
+            auth_servers:
+              - "https://keycloak.example.com/realms/mcp-servers"
+            jwks_uri: *JwksUri
+            scopes_supported:
+              - openid
+              - profile
+              - email
+              - groups
+              - mcp-server-template/custom-audience
+          
+            # Optional parameters (currently empty)
+            bearer_methods_supported: []
+            resource_signing_alg_values_supported: []
+            resource_name: ""
+            resource_documentation: ""
+            resource_policy_uri: ""
+            resource_tos_uri: ""
+            tls_client_certificate_bound_access_tokens: false
+            authorization_details_types_supported: []
+            dpop_signing_alg_values_supported: []
+            dpop_bound_access_tokens_required: false
 
-        # Middlewares related params
-        MIDDLEWARE_JWT_ENABLED: true
-        MIDDLEWARE_JWT_VALIDATION_STRATEGY: forwarded # Values: local, forwarded
-        MIDDLEWARE_JWT_VALIDATED_HEADER: X-Validated-Jwt
-        MIDDLEWARE_JWT_VALIDATION_LOCAL_JWKS_URI: &jwksUri https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs
-        MIDDLEWARE_JWT_VALIDATION_LOCAL_JWKS_CACHE_INTERVAL: 10s
-
-        # Oauth Protected Resource endpoint (/.well-known/oauth-protected-resource) related params
-        OAUTH_PR_ENABLED: true
-        OAUTH_PR_RESOURCE: https://tiny-mcp.example.com
-        OAUTH_PR_AUTH_SERVERS: https://keycloak.example.com/realms/mcp-servers
-        OAUTH_PR_JWKS_URI: *jwksUri
-        OAUTH_PR_SCOPES_SUPPORTED: 'openid,profile,email,groups,tiny-mcp/custom-audience'
-        OAUTH_PR_BEARER_METHODS_SUPPORTED: ''
-        OAUTH_PR_RESOURCE_SIGNING_ALG_VALUES_SUPPORTED: ''
-
-        OAUTH_PR_RESOURCE_NAME: ''
-        OAUTH_PR_RESOURCE_DOCUMENTATION: ''
-        OAUTH_PR_RESOURCE_POLICY_URI: ''
-        OAUTH_PR_RESOURCE_TOS_URI: ''
-
-        OAUTH_PR_TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKENS: ''
-        OAUTH_PR_AUTHORIZATION_DETAILS_TYPES_SUPPORTED: ''
-        OAUTH_PR_DPOP_SIGNING_ALG_VALUES_SUPPORTED: ''
-        OAUTH_PR_DPOP_BOUND_ACCESS_TOKENS_REQUIRED: ''
+  persistence:
+    configuration:
+      enabled: true
+      name: "{{ .Release.Name }}"
+      type: configMap
+      advancedMounts:
+        application: # Controller
+          main: # Container
+            - path: /data/config.yaml
+              readOnly: true
+              mountPropagation: None
+              subPath: config.yaml
 
   service:
     backend:
