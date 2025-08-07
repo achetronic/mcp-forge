@@ -7,6 +7,7 @@ import (
 )
 
 var (
-	Context = context.Background()
-	Logger  = slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	Context     = context.Background()
+	Logger      = slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	Environment = &EnvironmentOptions{}
 )

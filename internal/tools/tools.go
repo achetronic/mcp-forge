@@ -2,13 +2,29 @@ package tools
 
 import (
 	"tiny-mcp/internal/handlers"
+	"tiny-mcp/internal/middlewares"
 
 	//
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
 
-func AddTools(mcpServer *server.MCPServer) {
+type ToolsManagerDependencies struct {
+	McpServer   *server.MCPServer
+	Middlewares []middlewares.ToolMiddleware
+}
+
+type ToolsManager struct {
+	dependencies ToolsManagerDependencies
+}
+
+func NewToolsManager(deps ToolsManagerDependencies) *ToolsManager {
+	return &ToolsManager{
+		dependencies: deps,
+	}
+}
+
+func (tm *ToolsManager) AddTools() {
 
 	// 1. Describe a tool, then add it
 	tool := mcp.NewTool("hello_world",
@@ -18,11 +34,11 @@ func AddTools(mcpServer *server.MCPServer) {
 			mcp.Description("Name of the person to greet"),
 		),
 	)
-	mcpServer.AddTool(tool, handlers.HandleToolHello)
+	tm.dependencies.McpServer.AddTool(tool, handlers.HandleToolHello)
 
 	// 2. Describe and add another tool
 	tool = mcp.NewTool("whoami",
 		mcp.WithDescription("Expose information about the user"),
 	)
-	mcpServer.AddTool(tool, handlers.HandleToolWhoami)
+	tm.dependencies.McpServer.AddTool(tool, handlers.HandleToolWhoami)
 }

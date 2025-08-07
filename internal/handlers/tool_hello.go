@@ -3,8 +3,6 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
-	"tiny-mcp/internal/globals"
 
 	//
 	"github.com/mark3labs/mcp-go/mcp"
@@ -24,11 +22,6 @@ func HandleToolHello(ctx context.Context, request mcp.CallToolRequest) (*mcp.Cal
 			IsError: true,
 		}, nil
 	}
-
-	globals.Logger.Debug("showing parameters", "arguments", arguments, "request", request)
-
-	log.Print("request: ", request.Request)
-	log.Print("header: ", request.Header)
 
 	return &mcp.CallToolResult{
 		Content: []mcp.Content{
