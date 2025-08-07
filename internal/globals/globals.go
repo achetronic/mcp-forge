@@ -8,5 +8,5 @@ import (
 
 var (
 	Context = context.Background()
-	Logger  = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	Logger  = slog.New(slog.NewJSONHandler(os.Stderr, nil))
 )

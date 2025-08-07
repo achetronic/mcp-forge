@@ -10,7 +10,7 @@ import (
 
 func AddTools(mcpServer *server.MCPServer) {
 
-	// Describe a tool, then add it
+	// 1. Describe a tool, then add it
 	tool := mcp.NewTool("hello_world",
 		mcp.WithDescription("Say hello to someone"),
 		mcp.WithString("name",
@@ -18,6 +18,11 @@ func AddTools(mcpServer *server.MCPServer) {
 			mcp.Description("Name of the person to greet"),
 		),
 	)
-
 	mcpServer.AddTool(tool, handlers.HandleToolHello)
+
+	// 2. Describe and add another tool
+	tool = mcp.NewTool("whoami",
+		mcp.WithDescription("Expose information about the user"),
+	)
+	mcpServer.AddTool(tool, handlers.HandleToolWhoami)
 }

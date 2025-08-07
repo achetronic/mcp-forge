@@ -1,0 +1,16 @@
+.*
+!.gitignore
+!.github
+bin/*
+dist/*
+*.test
+*.out
+zz_generated.*
+*~
+config.yaml
+!docs/samples/config.yaml
+*.cartero
+seed_data.sql
+# It makes no sense to store locally used DB file
+*.db
+__*
