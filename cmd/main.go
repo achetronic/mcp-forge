@@ -49,7 +49,7 @@ func main() {
 	})
 	tm.AddTools()
 
-	// 3. Wrap MCP server in a transport (stdio, HTTP, SSE)
+	// 4. Wrap MCP server in a transport (stdio, HTTP, SSE)
 	switch globals.Environment.ServerTransport {
 	case globals.ServerTransportHttp:
 		httpServer := server.NewStreamableHTTPServer(mcpServer,
