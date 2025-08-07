@@ -5,15 +5,12 @@ import (
 	"fmt"
 
 	//
-	"mcp-server-template/internal/globals"
-
-	//
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-func HandleToolWhoami(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (h *HandlersManager) HandleToolWhoami(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 
-	validatedJwt := request.Header.Get(globals.Environment.ServerTransportHttpJwtValidatedHeader)
+	validatedJwt := request.Header.Get(h.dependencies.AppCtx.Config.Middleware.JWT.Validation.ForwardedHeader)
 
 	if validatedJwt == "" {
 		return &mcp.CallToolResult{

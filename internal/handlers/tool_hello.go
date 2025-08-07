@@ -8,7 +8,7 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-func HandleToolHello(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (h *HandlersManager) HandleToolHello(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	arguments := request.GetArguments()
 	name, ok := arguments["name"].(string)
 	if !ok {

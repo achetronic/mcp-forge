@@ -47,18 +47,24 @@ app-template:
       enabled: true
       annotations: {}
       data:
+        # Params related to the server
+        SERVER_NAME: "MCP Server Template"
+        SERVER_VERSION: "0.1.0"
         SERVER_TRANSPORT: http # Values: stdio, http
         SERVER_TRANSPORT_HTTP_HOST: ':8080'
 
-        # JWT forwarded by upstream proxy (Istio, etc.)
-        # Ref: https://istio.io/latest/docs/reference/config/security/request_authentication/#JWTRule-output_payload_to_header
-        SERVER_TRANSPORT_HTTP_JWT_VALIDATED_HEADER: X-Validated-Jwt
-        SERVER_TRANSPORT_HTTP_JWT_VALIDATION_STRATEGY: forwarded # values: local, forwarded
+        # Middlewares related params
+        MIDDLEWARE_JWT_ENABLED: true
+        MIDDLEWARE_JWT_VALIDATION_STRATEGY: forwarded # Values: local, forwarded
+        MIDDLEWARE_JWT_VALIDATED_HEADER: X-Validated-Jwt
+        MIDDLEWARE_JWT_VALIDATION_LOCAL_JWKS_URI: &jwksUri https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs
+        MIDDLEWARE_JWT_VALIDATION_LOCAL_JWKS_CACHE_INTERVAL: 10s
 
         # Oauth Protected Resource endpoint (/.well-known/oauth-protected-resource) related params
+        OAUTH_PR_ENABLED: true
         OAUTH_PR_RESOURCE: https://tiny-mcp.example.com
         OAUTH_PR_AUTH_SERVERS: https://keycloak.example.com/realms/mcp-servers
-        OAUTH_PR_JWKS_URI: https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs
+        OAUTH_PR_JWKS_URI: *jwksUri
         OAUTH_PR_SCOPES_SUPPORTED: 'openid,profile,email,groups,tiny-mcp/custom-audience'
         OAUTH_PR_BEARER_METHODS_SUPPORTED: ''
         OAUTH_PR_RESOURCE_SIGNING_ALG_VALUES_SUPPORTED: ''

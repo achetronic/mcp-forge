@@ -41,8 +41,7 @@ traffic, so your sessions are safe with it. It has been tested under heavy load 
 
 ### Setup
 1. Modify the code as needed
-2. Set environment variables: `source .env`
-3. Run: `make run`
+2. Run: `make run`
 
 **Note:** The `.env` file configures the server to run as an HTTP server. Without these variables, the server starts in stdio mode.
 
@@ -81,9 +80,10 @@ make build
   "mcpServers": {
     "stdio": {
       "command": "/home/example/mcp-server-template/bin/mcp-server-template-linux-amd64",
-      "env": {
-        "PLACEHOLDER": "placeholder"
-      }
+      "args": [
+        "--config",
+        "/home/example/mcp-server-template/docs/config-stdio.yaml"
+      ]
     }
   }
 }
@@ -102,7 +102,6 @@ Execute the following before configuring the client:
 
 ```console
 npm i mcp-remote && \
-source .env && \
 make run
 ```
 

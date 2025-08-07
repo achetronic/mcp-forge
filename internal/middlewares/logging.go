@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"log/slog"
+	"mcp-server-template/internal/globals"
 	"net/http"
 	"time"
 )
 
 type AccessLogsMiddlewareDependencies struct {
-	Logger *slog.Logger
+	AppCtx *globals.ApplicationContext
 }
 
 type AccessLogsMiddleware struct {
@@ -28,7 +28,7 @@ func (mw *AccessLogsMiddleware) Middleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, req)
 		duration := time.Since(start)
 
-		mw.dependencies.Logger.Info("AccessLogsMiddleware output",
+		mw.dependencies.AppCtx.Logger.Info("AccessLogsMiddleware output",
 			"method", req.Method,
 			"url", req.URL.String(),
 			"remote_addr", req.RemoteAddr,

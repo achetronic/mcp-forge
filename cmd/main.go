@@ -18,40 +18,46 @@ import (
 func main() {
 
 	// 0. Process the configuration
-	environmentOptions, err := globals.GetEnvironmentOptions()
+	appCtx, err := globals.NewApplicationContext()
 	if err != nil {
-		globals.Logger.Error("error processing environment vars", "error", err.Error())
-		return
+		log.Fatalf("failed creating application context: %v", err.Error())
 	}
-	globals.Environment = environmentOptions
 
 	// 1. Initialize middlewares that need it
 	accessLogsMw := middlewares.NewAccessLogsMiddleware(middlewares.AccessLogsMiddlewareDependencies{
-		Logger: globals.Logger,
+		AppCtx: appCtx,
 	})
 
 	jwtValidationMw := middlewares.NewJWTValidationMiddleware(middlewares.JWTValidationMiddlewareDependencies{
-		Logger: globals.Logger,
+		AppCtx: appCtx,
 	})
 
 	// 2. Create a new MCP server
 	mcpServer := server.NewMCPServer(
-		"MCP Server Template",
-		"0.1.0",
+		appCtx.Config.Server.Name,
+		appCtx.Config.Server.Version,
 		server.WithToolCapabilities(true),
 	)
 
-	// 3. Add some useful magic in the form of tools to your MCP server
+	// 3. Initialize handlers for later usage
+	hm := handlers.NewHandlersManager(handlers.HandlersManagerDependencies{
+		AppCtx: appCtx,
+	})
+
+	// 4. Add some useful magic in the form of tools to your MCP server
 	// This is the most useful part
 	tm := tools.NewToolsManager(tools.ToolsManagerDependencies{
-		McpServer:   mcpServer,
-		Middlewares: []middlewares.ToolMiddleware{},
+		AppCtx: appCtx,
+
+		HandlersManager: hm,
+		McpServer:       mcpServer,
+		Middlewares:     []middlewares.ToolMiddleware{},
 	})
 	tm.AddTools()
 
-	// 4. Wrap MCP server in a transport (stdio, HTTP, SSE)
-	switch globals.Environment.ServerTransport {
-	case globals.ServerTransportHttp:
+	// 5. Wrap MCP server in a transport (stdio, HTTP, SSE)
+	switch appCtx.Config.Server.Transport.Type {
+	case "http":
 		httpServer := server.NewStreamableHTTPServer(mcpServer,
 			server.WithHeartbeatInterval(30*time.Second),
 			server.WithStateLess(false))
@@ -61,18 +67,21 @@ func main() {
 		// Ref: https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization#overview
 		mux := http.NewServeMux()
 		mux.Handle("/mcp", accessLogsMw.Middleware(jwtValidationMw.Middleware(httpServer)))
-		mux.Handle("/.well-known/oauth-protected-resource", accessLogsMw.Middleware(http.HandlerFunc(handlers.HandleOauthProtectedResources)))
+
+		if appCtx.Config.OAuthProtectedResource.Enabled {
+			mux.Handle("/.well-known/oauth-protected-resource", accessLogsMw.Middleware(http.HandlerFunc(hm.HandleOauthProtectedResources)))
+		}
 
 		// Start StreamableHTTP server
-		globals.Logger.Info("Starting StreamableHTTP server", "host", globals.Environment.ServerTransportHttpHost)
-		err := http.ListenAndServe(globals.Environment.ServerTransportHttpHost, mux)
+		appCtx.Logger.Info("Starting StreamableHTTP server", "host", appCtx.Config.Server.Transport.HTTP.Host)
+		err := http.ListenAndServe(appCtx.Config.Server.Transport.HTTP.Host, mux)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 	default:
 		// Start stdio server
-		globals.Logger.Info("Starting stdio server")
+		appCtx.Logger.Info("Starting stdio server")
 		if err := server.ServeStdio(mcpServer); err != nil {
 			log.Fatal(err)
 		}

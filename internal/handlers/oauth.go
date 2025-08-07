@@ -3,9 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-
-	//
-	"mcp-server-template/internal/globals"
 )
 
 // OauthProtectedResourceResponse represents the response returned by '.well-known/oauth-protected-resource' endpoint
@@ -35,30 +32,30 @@ type OauthProtectedResourceResponse struct {
 	DpopBoundAccessTokensRequired         bool     `json:"dpop_bound_access_tokens_required,omitempty"`          // Optional
 }
 
-func HandleOauthProtectedResources(response http.ResponseWriter, request *http.Request) {
+func (h *HandlersManager) HandleOauthProtectedResources(response http.ResponseWriter, request *http.Request) {
 
 	//
 	ResponseObject := &OauthProtectedResourceResponse{
-		Resource:                              globals.Environment.Resource,
-		AuthorizationServers:                  globals.Environment.AuthorizationServers,
-		JwksUri:                               globals.Environment.JwksUri,
-		ScopesSupported:                       globals.Environment.ScopesSupported,
-		BearerMethodsSupported:                globals.Environment.BearerMethodsSupported,
-		ResourceSigningAlgValuesSupported:     globals.Environment.ResourceSigningAlgValuesSupported,
-		ResourceName:                          globals.Environment.ResourceName,
-		ResourceDocumentation:                 globals.Environment.ResourceDocumentation,
-		ResourcePolicyUri:                     globals.Environment.ResourcePolicyUri,
-		ResourceTosUri:                        globals.Environment.ResourceTosUri,
-		TlsClientCertificateBoundAccessTokens: globals.Environment.TlsClientCertificateBoundAccessTokens,
-		AuthorizationDetailsTypesSupported:    globals.Environment.AuthorizationDetailsTypesSupported,
-		DpopSigningAlgValuesSupported:         globals.Environment.DpopSigningAlgValuesSupported,
-		DpopBoundAccessTokensRequired:         globals.Environment.DpopBoundAccessTokensRequired,
+		Resource:                              h.dependencies.AppCtx.Config.OAuthProtectedResource.Resource,
+		AuthorizationServers:                  h.dependencies.AppCtx.Config.OAuthProtectedResource.AuthServers,
+		JwksUri:                               h.dependencies.AppCtx.Config.OAuthProtectedResource.JWKSUri,
+		ScopesSupported:                       h.dependencies.AppCtx.Config.OAuthProtectedResource.ScopesSupported,
+		BearerMethodsSupported:                h.dependencies.AppCtx.Config.OAuthProtectedResource.BearerMethodsSupported,
+		ResourceSigningAlgValuesSupported:     h.dependencies.AppCtx.Config.OAuthProtectedResource.ResourceSigningAlgValuesSupported,
+		ResourceName:                          h.dependencies.AppCtx.Config.OAuthProtectedResource.ResourceName,
+		ResourceDocumentation:                 h.dependencies.AppCtx.Config.OAuthProtectedResource.ResourceDocumentation,
+		ResourcePolicyUri:                     h.dependencies.AppCtx.Config.OAuthProtectedResource.ResourcePolicyUri,
+		ResourceTosUri:                        h.dependencies.AppCtx.Config.OAuthProtectedResource.ResourceTosUri,
+		TlsClientCertificateBoundAccessTokens: h.dependencies.AppCtx.Config.OAuthProtectedResource.TLSClientCertificateBoundAccessTokens,
+		AuthorizationDetailsTypesSupported:    h.dependencies.AppCtx.Config.OAuthProtectedResource.AuthorizationDetailsTypesSupported,
+		DpopSigningAlgValuesSupported:         h.dependencies.AppCtx.Config.OAuthProtectedResource.DPoPSigningAlgValuesSupported,
+		DpopBoundAccessTokensRequired:         h.dependencies.AppCtx.Config.OAuthProtectedResource.DPoPBoundAccessTokensRequired,
 	}
 
 	// Transform into JSON
 	ResponseObjectBytes, err := json.Marshal(ResponseObject)
 	if err != nil {
-		globals.Logger.Error("error converting response into json", "error", err.Error())
+		h.dependencies.AppCtx.Logger.Error("error converting response into json", "error", err.Error())
 		http.Error(response, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -71,7 +68,7 @@ func HandleOauthProtectedResources(response http.ResponseWriter, request *http.R
 
 	_, err = response.Write(ResponseObjectBytes)
 	if err != nil {
-		globals.Logger.Error("error sending response to client", "error", err.Error())
+		h.dependencies.AppCtx.Logger.Error("error sending response to client", "error", err.Error())
 		return
 	}
 }

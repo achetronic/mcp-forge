@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"mcp-server-template/internal/globals"
 	"mcp-server-template/internal/handlers"
 	"mcp-server-template/internal/middlewares"
 
@@ -10,8 +11,11 @@ import (
 )
 
 type ToolsManagerDependencies struct {
-	McpServer   *server.MCPServer
-	Middlewares []middlewares.ToolMiddleware
+	AppCtx *globals.ApplicationContext
+
+	HandlersManager *handlers.HandlersManager
+	McpServer       *server.MCPServer
+	Middlewares     []middlewares.ToolMiddleware
 }
 
 type ToolsManager struct {
@@ -34,11 +38,11 @@ func (tm *ToolsManager) AddTools() {
 			mcp.Description("Name of the person to greet"),
 		),
 	)
-	tm.dependencies.McpServer.AddTool(tool, handlers.HandleToolHello)
+	tm.dependencies.McpServer.AddTool(tool, tm.dependencies.HandlersManager.HandleToolHello)
 
 	// 2. Describe and add another tool
 	tool = mcp.NewTool("whoami",
 		mcp.WithDescription("Expose information about the user"),
 	)
-	tm.dependencies.McpServer.AddTool(tool, handlers.HandleToolWhoami)
+	tm.dependencies.McpServer.AddTool(tool, tm.dependencies.HandlersManager.HandleToolWhoami)
 }

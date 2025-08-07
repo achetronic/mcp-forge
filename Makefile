@@ -84,7 +84,7 @@ build: fmt vet ## Build CLI binary.
 
 .PHONY: run
 run: fmt vet ## Run a controller from your host.
-	go run ./cmd/
+	go run ./cmd/ --config ./docs/config-http.yaml
 
 # If you wish to build the manager image targeting other platforms you can use the --platform flag.
 # (i.e. docker build --platform linux/arm64). However, you must enable docker buildKit for it.

@@ -2,16 +2,13 @@ package middlewares
 
 import (
 	"context"
-	"log/slog"
-	
+
 	//
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
 
-type NoopMiddlewareDependencies struct {
-	Logger *slog.Logger
-}
+type NoopMiddlewareDependencies struct{}
 
 type NoopMiddleware struct {
 	dependencies NoopMiddlewareDependencies
