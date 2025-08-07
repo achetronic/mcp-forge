@@ -4,13 +4,3 @@ server:
   version: "0.1.0"
   transport:
     type: "stdio"
-
-# Middleware Configuration
-middleware:
-  jwt:
-    enabled: false
-
-# OAuth Protected Resource Configuration
-# Endpoint: /.well-known/oauth-protected-resource
-oauth_protected_resource:
-  enabled: false
