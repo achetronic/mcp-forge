@@ -1,0 +1,230 @@
+# We are using a meta Helm chart called app-template from bwj-s.
+# Reference values can be inspected there.
+# Ref: https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
+
+app-template:
+
+  defaultPodOptions:
+    annotations:
+      sidecar.istio.io/inject: "true"
+
+    labels: {}
+
+  controllers:
+
+    application:
+      type: deployment
+      replicas: 2
+
+      labels: {}
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+      containers:
+        main:
+          image:
+            repository: ghcr.io/achetronic/mcp-server-template
+            tag: latest
+            pullPolicy: Always
+
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "1"
+            limits:
+              memory: "512Mi"
+
+          envFrom:
+            - configMapRef:
+                identifier: configuration
+                
+            # Uncomment this if the related section is enabled in 'rawResources'
+            #- secretRef:
+            #    name: "{{ .Release.Name }}-credentials"
+
+  configMaps:
+    configuration:
+      enabled: true
+      annotations: {}
+      data:
+        SERVER_TRANSPORT: http # Values: stdio, http
+        SERVER_TRANSPORT_HTTP_HOST: ':8080'
+
+        # JWT forwarded by upstream proxy (Istio, etc.)
+        # Ref: https://istio.io/latest/docs/reference/config/security/request_authentication/#JWTRule-output_payload_to_header
+        SERVER_TRANSPORT_HTTP_JWT_VALIDATED_HEADER: X-Validated-Jwt
+        SERVER_TRANSPORT_HTTP_JWT_VALIDATION_STRATEGY: forwarded # values: local, forwarded
+
+        # Oauth Protected Resource endpoint (/.well-known/oauth-protected-resource) related params
+        OAUTH_PR_RESOURCE: https://tiny-mcp.example.com
+        OAUTH_PR_AUTH_SERVERS: https://keycloak.example.com/realms/mcp-servers
+        OAUTH_PR_JWKS_URI: https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs
+        OAUTH_PR_SCOPES_SUPPORTED: 'openid,profile,email,groups,tiny-mcp/custom-audience'
+        OAUTH_PR_BEARER_METHODS_SUPPORTED: ''
+        OAUTH_PR_RESOURCE_SIGNING_ALG_VALUES_SUPPORTED: ''
+
+        OAUTH_PR_RESOURCE_NAME: ''
+        OAUTH_PR_RESOURCE_DOCUMENTATION: ''
+        OAUTH_PR_RESOURCE_POLICY_URI: ''
+        OAUTH_PR_RESOURCE_TOS_URI: ''
+
+        OAUTH_PR_TLS_CLIENT_CERTIFICATE_BOUND_ACCESS_TOKENS: ''
+        OAUTH_PR_AUTHORIZATION_DETAILS_TYPES_SUPPORTED: ''
+        OAUTH_PR_DPOP_SIGNING_ALG_VALUES_SUPPORTED: ''
+        OAUTH_PR_DPOP_BOUND_ACCESS_TOKENS_REQUIRED: ''
+
+  service:
+    backend:
+      controller: application
+      type: ClusterIP
+      ports:
+        http:
+          port: 8080
+          protocol: TCP
+
+  # Some stuff is not covered by this chart
+  rawResources:
+    credentials:
+      enabled: false
+      apiVersion: external-secrets.io/v1beta1
+      kind: ExternalSecret
+      spec:
+        spec:
+          refreshInterval: "15s"
+          secretStoreRef:
+            name: external-secrets-hashicorp-vault
+            kind: ClusterSecretStore
+          target:
+            name: "{{ .Release.Name }}-credentials"
+          data:
+            - secretKey: PLACEHOLDER
+              remoteRef:
+                key: your-kv/applications/mcp-server-template/credentials
+                property: username
+
+    public-api-entrance:
+      enabled: false
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      spec:
+        spec:
+          hostnames:
+            - mcp-server-template.example.com
+          parentRefs:
+            - group: gateway.networking.k8s.io
+              kind: Gateway
+              name: production
+              namespace: istio
+              sectionName: https-terminate
+          rules:
+            - backendRefs: &mainBackendRef
+                - group: ""
+                  kind: Service
+                  name: mcp-server-template
+                  port: 8080
+                  weight: 1
+              matches:
+                - path:
+                    type: PathPrefix
+                    value: /
+
+    # This is temporary here as a trick to preserve real-client-ip. The ideal solution is trusting CIDRs, but it requires
+    # Istio be able to set 'use_remote_address: false' and ATM, it's hardcoded for the gateways:
+    # Ref: https://github.com/istio/istio/blob/f772ceea87ae58896e1eabe2cf83ebfd8c54bf6d/pilot/pkg/networking/core/v1alpha3/gateway.go#L358
+    preserve-client-ip:
+      enabled: false
+      apiVersion: networking.istio.io/v1alpha3
+      kind: EnvoyFilter
+      spec:
+        spec:
+          workloadSelector:
+            labels:
+              app.kubernetes.io/name: mcp-server-template
+          configPatches:
+            - applyTo: NETWORK_FILTER
+              match:
+                context: ANY
+                listener:
+                  filterChain:
+                    filter:
+                      name: envoy.filters.network.http_connection_manager
+              patch:
+                operation: MERGE
+                value:
+                  typed_config:
+                    '@type': type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                    xff_num_trusted_hops: 3
+                    use_remote_address: true
+                    skip_xff_append: false
+
+    istio-deny-access-from-untrusted-sources:
+      enabled: false
+      apiVersion: security.istio.io/v1
+      kind: AuthorizationPolicy
+      spec:
+        spec:
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: mcp-server-template
+
+          action: DENY
+          rules:
+            - from:
+                - source:
+                    notRemoteIpBlocks:
+                      # Kubernetes stuff
+                      - 10.0.0.0/8
+
+                      # Claude Web GUI
+                      - 34.162.102.82/32
+                      - 34.162.183.95/32
+                      - 34.162.142.92/32
+                      - 34.162.46.92/32
+                      - 34.162.136.91/32
+
+                      # Other providers from here
+                      # ...
+              to:
+                - operation:
+                    paths:
+                      - /
+                      - /*
+
+    istio-request-authentication-header:
+      enabled: false
+      apiVersion: security.istio.io/v1
+      kind: RequestAuthentication
+      spec:
+        spec:
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: mcp-server-template
+          jwtRules:
+            - forwardOriginalToken: true
+              outputPayloadToHeader: X-Validated-Jwt
+              issuer: https://keycloak.example.com/realms/mcp-servers
+              jwksUri: https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs
+
+    istio-check-jwt-claims:
+      enabled: false
+      apiVersion: security.istio.io/v1
+      kind: AuthorizationPolicy
+      spec:
+        spec:
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: mcp-server-template
+          action: DENY
+          rules:
+            - to:
+                - operation:
+                    paths:
+                      - /mcp
+                      - /mcp/*
+              when:
+                - key: request.auth.claims[iss]
+                  notValues:
+                    - https://keycloak.example.com/realms/mcp-servers
+                - key: request.auth.audiences
+                  notValues:
+                    - https://mcp-server-template.example.com

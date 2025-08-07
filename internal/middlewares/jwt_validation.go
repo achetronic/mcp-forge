@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	//
-	"tiny-mcp/internal/globals"
+	"mcp-server-template/internal/globals"
 )
 
 type JWTValidationMiddlewareDependencies struct {

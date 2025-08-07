@@ -4,24 +4,16 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"tiny-mcp/internal/middlewares"
 
 	//
-	"tiny-mcp/internal/globals"
-	"tiny-mcp/internal/handlers"
-	"tiny-mcp/internal/tools"
+	"mcp-server-template/internal/globals"
+	"mcp-server-template/internal/handlers"
+	"mcp-server-template/internal/middlewares"
+	"mcp-server-template/internal/tools"
 
 	//
 	"github.com/mark3labs/mcp-go/server"
 )
-
-type ServerOptions struct {
-	Transport         string `env:"SERVER_TRANSPORT"`
-	TransportHttpHost string `env:"SERVER_TRANSPORT_HTTP_HOST"`
-
-	TransportHttpForwardedJwtHeader    string `env:"SERVER_TRANSPORT_HTTP_FORWARDED_JWT_HEADER"`
-	TransportHttpJwtValidationStrategy string `env:"SERVER_TRANSPORT_HTTP_JWT_VALIDATION_STRATEGY"`
-}
 
 func main() {
 
@@ -44,7 +36,7 @@ func main() {
 
 	// 2. Create a new MCP server
 	mcpServer := server.NewMCPServer(
-		"Tiny MCP Server",
+		"MCP Server Template",
 		"0.1.0",
 		server.WithToolCapabilities(true),
 	)

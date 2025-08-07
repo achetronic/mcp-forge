@@ -1,0 +1,7 @@
+apiVersion: v2
+name: mcp-server-template
+version: 0.1.0
+dependencies:
+  - name: app-template
+    version: 4.1.2
+    repository: https://bjw-s-labs.github.io/helm-charts

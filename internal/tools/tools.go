@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"tiny-mcp/internal/handlers"
-	"tiny-mcp/internal/middlewares"
+	"mcp-server-template/internal/handlers"
+	"mcp-server-template/internal/middlewares"
 
 	//
 	"github.com/mark3labs/mcp-go/mcp"

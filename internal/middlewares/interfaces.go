@@ -1,8 +1,10 @@
 package middlewares
 
 import (
-	"github.com/mark3labs/mcp-go/server"
 	"net/http"
+
+	//
+	"github.com/mark3labs/mcp-go/server"
 )
 
 type ToolMiddleware interface {

@@ -1,4 +1,4 @@
-module tiny-mcp
+module mcp-server-template
 
 go 1.24
 

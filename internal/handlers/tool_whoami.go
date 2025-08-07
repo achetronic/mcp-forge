@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	//
-	"tiny-mcp/internal/globals"
+	"mcp-server-template/internal/globals"
 
 	//
 	"github.com/mark3labs/mcp-go/mcp"

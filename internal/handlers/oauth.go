@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	//
-	"tiny-mcp/internal/globals"
+	"mcp-server-template/internal/globals"
 )
 
 // OauthProtectedResourceResponse represents the response returned by '.well-known/oauth-protected-resource' endpoint
