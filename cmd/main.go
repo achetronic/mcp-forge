@@ -28,9 +28,12 @@ func main() {
 		AppCtx: appCtx,
 	})
 
-	jwtValidationMw := middlewares.NewJWTValidationMiddleware(middlewares.JWTValidationMiddlewareDependencies{
+	jwtValidationMw, err := middlewares.NewJWTValidationMiddleware(middlewares.JWTValidationMiddlewareDependencies{
 		AppCtx: appCtx,
 	})
+	if err != nil {
+		appCtx.Logger.Info("failed starting JWT validation middleware", "error", err.Error())
+	}
 
 	// 2. Create a new MCP server
 	mcpServer := server.NewMCPServer(
@@ -77,7 +80,7 @@ func main() {
 		}
 
 		// Start StreamableHTTP server
-		appCtx.Logger.Info("Starting StreamableHTTP server", "host", appCtx.Config.Server.Transport.HTTP.Host)
+		appCtx.Logger.Info("starting StreamableHTTP server", "host", appCtx.Config.Server.Transport.HTTP.Host)
 		err := http.ListenAndServe(appCtx.Config.Server.Transport.HTTP.Host, mux)
 		if err != nil {
 			log.Fatal(err)
@@ -85,7 +88,7 @@ func main() {
 
 	default:
 		// Start stdio server
-		appCtx.Logger.Info("Starting stdio server")
+		appCtx.Logger.Info("starting stdio server")
 		if err := server.ServeStdio(mcpServer); err != nil {
 			log.Fatal(err)
 		}

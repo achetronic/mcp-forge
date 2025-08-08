@@ -70,13 +70,18 @@ app-template:
             jwt:
               enabled: false
               validation:
-                strategy: "forwarded"  # Values: 'local' or 'forwarded'
+                strategy: "external"  # Values: 'local' or 'external'
                 # JWT forwarded by upstream proxy (Istio, etc.)
                 # Ref: https://istio.io/latest/docs/reference/config/security/request_authentication/#JWTRule-output_payload_to_header
                 forwarded_header: "X-Validated-Jwt"
                 local:
                   jwks_uri: &JwksUri "https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs"
                   cache_interval: "10s"
+          
+                  # CEL expressions to fine tune allowance. JWT payload is available under object 'payload'
+                  allow_conditions: []
+                    #- expression: 'payload.groups.exists(group, group in ["admin", "editor"])'
+                    #- expression: 'has(payload.email) && payload.email.endsWith("@example.com")'
           
           # Oauth Authorization Server Configuration
           # Endpoint: /.well-known/oauth-authorization-server

@@ -28,8 +28,14 @@ type AccessLogsConfig struct {
 
 // JWTValidationLocalConfig represents the local JWT validation configuration
 type JWTValidationLocalConfig struct {
-	JWKSUri       string        `yaml:"jwks_uri"`
-	CacheInterval time.Duration `yaml:"cache_interval"`
+	JWKSUri         string                        `yaml:"jwks_uri"`
+	CacheInterval   time.Duration                 `yaml:"cache_interval"`
+	AllowConditions []JWTValidationAllowCondition `yaml:"allow_conditions,omitempty"`
+}
+
+// JWTValidationAllowCondition represents a condition for allowing a request after the local JWT validation configuration
+type JWTValidationAllowCondition struct {
+	Expression string `yaml:"expression"`
 }
 
 // JWTValidationConfig represents the JWT validation configuration
