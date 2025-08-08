@@ -36,9 +36,10 @@ type OauthProtectedResourceResponse struct {
 // HandleOauthAuthorizationServer process requests for endpoint: /.well-known/oauth-authorization-server
 func (h *HandlersManager) HandleOauthAuthorizationServer(response http.ResponseWriter, request *http.Request) {
 
-	remoteResponse, err := http.Get(h.dependencies.AppCtx.Config.OAuthAuthorizationServer.IssuerUri + "/.well-known/openid-configuration")
+	remoteUrl := h.dependencies.AppCtx.Config.OAuthAuthorizationServer.IssuerUri + "/.well-known/openid-configuration"
+	remoteResponse, err := http.Get(remoteUrl)
 	if err != nil {
-		h.dependencies.AppCtx.Logger.Error("error getting remote .well-known/openid-configuration config", "error", err.Error())
+		h.dependencies.AppCtx.Logger.Error("error getting content from /.well-known/openid-configuration", "error", err.Error())
 		http.Error(response, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

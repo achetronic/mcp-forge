@@ -54,7 +54,7 @@ type MiddlewareConfig struct {
 // OAuthAuthorizationServer represents the OAuth Authorization Server configuration
 type OAuthAuthorizationServer struct {
 	Enabled   bool   `yaml:"enabled"`
-	IssuerUri string `yaml:"issuer"`
+	IssuerUri string `yaml:"issuer_uri"`
 }
 
 // OAuthProtectedResourceConfig represents the OAuth Protected Resource configuration
