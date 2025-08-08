@@ -28,12 +28,29 @@ func (mw *AccessLogsMiddleware) Middleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, req)
 		duration := time.Since(start)
 
+		filteredHeaders := req.Header.Clone()
+		// Redact selected headers
+		for _, redactedHeader := range mw.dependencies.AppCtx.Config.Middleware.AccessLogs.RedactedHeaders {
+			tmpHeader := filteredHeaders.Get(redactedHeader)
+
+			if len(tmpHeader) >= 10 {
+				filteredHeaders.Set(redactedHeader, tmpHeader[:10]+"***")
+				continue
+			}
+			filteredHeaders.Set(redactedHeader, "***")
+		}
+
+		// Exclude selected headers
+		for _, excludedHeader := range mw.dependencies.AppCtx.Config.Middleware.AccessLogs.ExcludedHeaders {
+			filteredHeaders.Del(excludedHeader)
+		}
+
 		mw.dependencies.AppCtx.Logger.Info("AccessLogsMiddleware output",
 			"method", req.Method,
 			"url", req.URL.String(),
 			"remote_addr", req.RemoteAddr,
 			"user_agent", req.UserAgent(),
-			"headers", req.Header,
+			"headers", filteredHeaders,
 			"request_duration", duration.String(),
 		)
 	})

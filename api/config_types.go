@@ -20,6 +20,12 @@ type ServerConfig struct {
 	Transport ServerTransportConfig `yaml:"transport,omitempty"`
 }
 
+// AccessLogsConfig represents the AccessLogs middleware configuration
+type AccessLogsConfig struct {
+	ExcludedHeaders []string `yaml:"excluded_headers"`
+	RedactedHeaders []string `yaml:"redacted_headers"`
+}
+
 // JWTValidationLocalConfig represents the local JWT validation configuration
 type JWTValidationLocalConfig struct {
 	JWKSUri       string        `yaml:"jwks_uri"`
@@ -41,7 +47,8 @@ type JWTConfig struct {
 
 // MiddlewareConfig represents the middleware configuration section
 type MiddlewareConfig struct {
-	JWT JWTConfig `yaml:"jwt,omitempty"`
+	AccessLogs AccessLogsConfig `yaml:"access_logs"`
+	JWT        JWTConfig        `yaml:"jwt,omitempty"`
 }
 
 // OAuthAuthorizationServer represents the OAuth Authorization Server configuration

@@ -59,6 +59,14 @@ app-template:
           
           # Middleware Configuration
           middleware:
+          
+            access_logs:
+              excluded_headers:
+                - X-Excluded
+              redacted_headers:
+                - Authorization
+                - X-Validated-Jwt
+        
             jwt:
               enabled: false
               validation:

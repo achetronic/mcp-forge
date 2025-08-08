@@ -103,7 +103,7 @@ func (mw *JWTValidationMiddleware) isTokenValid(token string) (bool, error) {
 	// Look for the published key with the same Kid as the token
 	var matchingKey *JWK
 	for _, key := range jwks.Keys {
-		if key.Kid == kid {
+		if key.Kid == kid && (key.Use == "" || key.Use == "sig") {
 			matchingKey = &key
 			break
 		}
