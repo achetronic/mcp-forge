@@ -68,6 +68,10 @@ func main() {
 		mux := http.NewServeMux()
 		mux.Handle("/mcp", accessLogsMw.Middleware(jwtValidationMw.Middleware(httpServer)))
 
+		if appCtx.Config.OAuthAuthorizationServer.Enabled {
+			mux.Handle("/.well-known/oauth-authorization-server", accessLogsMw.Middleware(http.HandlerFunc(hm.HandleOauthAuthorizationServer)))
+		}
+
 		if appCtx.Config.OAuthProtectedResource.Enabled {
 			mux.Handle("/.well-known/oauth-protected-resource", accessLogsMw.Middleware(http.HandlerFunc(hm.HandleOauthProtectedResources)))
 		}

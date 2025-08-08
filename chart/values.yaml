@@ -60,7 +60,7 @@ app-template:
           # Middleware Configuration
           middleware:
             jwt:
-              enabled: true
+              enabled: false
               validation:
                 strategy: "forwarded"  # Values: 'local' or 'forwarded'
                 # JWT forwarded by upstream proxy (Istio, etc.)
@@ -70,6 +70,14 @@ app-template:
                   jwks_uri: &JwksUri "https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs"
                   cache_interval: "10s"
           
+          # Oauth Authorization Server Configuration
+          # Endpoint: /.well-known/oauth-authorization-server
+          oauth_authorization_server:
+            enabled: true
+          
+            # Following path will be attached: /.well-known/openid-configuration
+            issuer_uri: "https://keycloak.example.com/realms/mcp-servers"
+    
           # OAuth Protected Resource Configuration
           # Endpoint: /.well-known/oauth-protected-resource
           oauth_protected_resource:

@@ -44,6 +44,12 @@ type MiddlewareConfig struct {
 	JWT JWTConfig `yaml:"jwt,omitempty"`
 }
 
+// OAuthAuthorizationServer represents the OAuth Authorization Server configuration
+type OAuthAuthorizationServer struct {
+	Enabled   bool   `yaml:"enabled"`
+	IssuerUri string `yaml:"issuer"`
+}
+
 // OAuthProtectedResourceConfig represents the OAuth Protected Resource configuration
 type OAuthProtectedResourceConfig struct {
 	Enabled                               bool     `yaml:"enabled"`
@@ -65,7 +71,8 @@ type OAuthProtectedResourceConfig struct {
 
 // Configuration represents the complete configuration structure
 type Configuration struct {
-	Server                 ServerConfig                 `yaml:"server,omitempty"`
-	Middleware             MiddlewareConfig             `yaml:"middleware,omitempty"`
-	OAuthProtectedResource OAuthProtectedResourceConfig `yaml:"oauth_protected_resource,omitempty"`
+	Server                   ServerConfig                 `yaml:"server,omitempty"`
+	Middleware               MiddlewareConfig             `yaml:"middleware,omitempty"`
+	OAuthAuthorizationServer OAuthAuthorizationServer     `yaml:"oauth_authorization_server,omitempty"`
+	OAuthProtectedResource   OAuthProtectedResourceConfig `yaml:"oauth_protected_resource,omitempty"`
 }

@@ -20,7 +20,15 @@ middleware:
         jwks_uri: &JwksUri "https://keycloak.example.com/realms/mcp-servers/protocol/openid-connect/certs"
         cache_interval: "10s"
 
-# OAuth Protected Resource Configuration
+# Oauth Authorization Server Configuration
+# Endpoint: /.well-known/oauth-authorization-server
+oauth_authorization_server:
+  enabled: true
+
+  # Following path will be attached: /.well-known/openid-configuration
+  issuer_uri: "https://keycloak.example.com/realms/mcp-servers"
+
+# Oauth Protected Resource Configuration
 # Endpoint: /.well-known/oauth-protected-resource
 oauth_protected_resource:
   enabled: true
