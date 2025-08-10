@@ -11,12 +11,12 @@ but with local providers like Claude Desktop too.
 ## Features
 
 - 🔐 **OAuth RFC 8414** compliant
-- Support for `.well-known/oauth-protected-resource` and `.well-known/oauth-authorization-server` endpoints
-- Both endpoints are configurable
+  - Support for `.well-known/oauth-protected-resource` and `.well-known/oauth-authorization-server` endpoints
+  - Both endpoints are configurable
 
 - 🛡️ **Several JWT validation methods**
-- Delegated to external systems like Istio
-- Locally validated based on JWKS URI and CEL expressions for claims
+  - Delegated to external systems like Istio
+  - Locally validated based on JWKS URI and CEL expressions for claims
 
 - 📋 Access logs can exclude or redact fields
 - 🚀 Production-ready: Included full examples, Dockerfile, Helm Chart and GitHub Actions for CI
