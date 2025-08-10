@@ -2,7 +2,6 @@ package tools
 
 import (
 	"mcp-forge/internal/globals"
-	"mcp-forge/internal/handlers"
 	"mcp-forge/internal/middlewares"
 
 	//
@@ -13,9 +12,8 @@ import (
 type ToolsManagerDependencies struct {
 	AppCtx *globals.ApplicationContext
 
-	HandlersManager *handlers.HandlersManager
-	McpServer       *server.MCPServer
-	Middlewares     []middlewares.ToolMiddleware
+	McpServer   *server.MCPServer
+	Middlewares []middlewares.ToolMiddleware
 }
 
 type ToolsManager struct {

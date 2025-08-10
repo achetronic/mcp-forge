@@ -52,11 +52,19 @@ func main() {
 	tm := tools.NewToolsManager(tools.ToolsManagerDependencies{
 		AppCtx: appCtx,
 
-		HandlersManager: hm,
-		McpServer:       mcpServer,
-		Middlewares:     []middlewares.ToolMiddleware{},
+		McpServer:   mcpServer,
+		Middlewares: []middlewares.ToolMiddleware{},
 	})
 	tm.AddTools()
+
+	// TODO: Include custom user-created logic like adding a ResourcesManager when needed
+	// rm := resources.NewResourcesManager(tools.ResourcesManagerDependencies{
+	// 	 AppCtx: appCtx,
+	//
+	// 	 McpServer:       mcpServer,
+	// 	 Middlewares:     []middlewares.ResourcesMiddleware{},
+	// })
+	// rm.AddResources()
 
 	// 5. Wrap MCP server in a transport (stdio, HTTP, SSE)
 	switch appCtx.Config.Server.Transport.Type {

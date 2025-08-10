@@ -1,6 +1,12 @@
 # MCP Forge
 
-## Description
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/achetronic/mcp-forge)
+![GitHub](https://img.shields.io/github/license/achetronic/mcp-forge)
+
+![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCeSb3yfsPNNVr13YsYNvCAw?label=achetronic&link=http%3A%2F%2Fyoutube.com%2Fachetronic)
+![GitHub followers](https://img.shields.io/github/followers/achetronic?label=achetronic&link=http%3A%2F%2Fgithub.com%2Fachetronic)
+![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/achetronic?style=flat&logo=twitter&link=https%3A%2F%2Ftwitter.com%2Fachetronic)
+
 A production-ready MCP (Model Context Protocol) server template (oauth authorization included) built in Go that works with major AI providers.
 
 ## Motivation
@@ -50,32 +56,39 @@ Our recommendations for remote servers in production:
 traffic, so your sessions are safe with it. It has been tested under heavy load in production scenarios
 
 
-## Development
+## How to develop your MCP
 
 ### Prerequisites
 - Go 1.24+
 
-### Setup
-1. Modify the code as needed
-2. Run: `make run`
+### Modify the code and run
 
-**Note:** The `.env` file configures the server to run as an HTTP server. Without these variables, the server starts in stdio mode.
+Obviously, you can modify the entire codebase as this is a template, but:
+- Most times, you will only need to code inside `internal/tools` directory **to add your MCP Tools and their logic**
+- Sometimes, you will need to **add your MCP Resources**. For that, it's recommended: 
+  - To clone `internal/tools` directory into `internal/resources` and rename the structures there
+  - To add the missing logic in `cmd/main.go` for invoking your code
+
+Run: `make run`
+
+**Note:** Default YAML config executing the previous command start the server as an HTTP server. 
+To start it as Stdio mode, just modify the Makefile to use other YAML provided in examples.
 
 ### Configuration Examples
 
-### Remote Clients (Claude Web, OpenAI)
+#### 🔗 Remote Clients (Claude Web, OpenAI)
 
 Remote clients like Claude Web have different requirements than local ones. 
 This project is fully ready for dealing with Claude Web with zero effort in your side.
 
 In general, if you follow our recommendations on production, all the remote clients are covered 😊
 
-### Local Clients (Claude Desktop, Cursor, VSCode)
+#### 💻 Local Clients (Claude Desktop, Cursor, VSCode)
 
 Local clients configuration is commonly based in a JSON file with a specific standard structure. For example,
 Claude Desktop can be configured by modifying the settings file called `claude_desktop_config.json` with the following sections:
 
-#### Stdio Mode
+##### Stdio Mode
 
 If you want to use stdio as transport layer, it's recommended to compile your Go binary and then configure the client
 as follows. This is recommended in local development as it is easy to work with.
@@ -105,7 +118,7 @@ make build
 }
 ```
 
-#### HTTP Mode
+##### HTTP Mode
 
 It is possible to launch your MCP server using HTTP transport. As most of local clients doesn't support connecting to
 remote servers natively, we use a package (`mcp-remote`) to act as an intermediate between the expected stdio, 
