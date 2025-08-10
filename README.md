@@ -1,11 +1,27 @@
 # MCP Server Template
 
 ## Description
-A production-ready MCP (Model Context Protocol) server template built in Go that works with major AI providers.
+A production-ready MCP (Model Context Protocol) server template (oauth authorization included) built in Go that works with major AI providers.
 
 ## Motivation
 The MCP specification is relatively new and lacks comprehensive documentation for building complete servers in Go. 
-This template provides a fully compliant MCP server that integrates seamlessly with Claude Desktop, Claude Web, and OpenAI.
+This template provides a fully compliant MCP server that integrates seamlessly with remote providers like Claude Web, and OpenAI, 
+but with local providers like Claude Desktop too.
+
+## Features
+
+- 🔐 **OAuth RFC 8414** compliant
+- Support for `.well-known/oauth-protected-resource` and `.well-known/oauth-authorization-server` endpoints
+- Both endpoints are configurable
+
+- 🛡️ **Several JWT validation methods**
+- Delegated to external systems like Istio
+- Locally validated based on JWKS URI and CEL expressions for claims
+
+- 📋 Access logs can exclude or redact fields
+- 🚀 Production-ready: Included full examples, Dockerfile, Helm Chart and GitHub Actions for CI
+- ⚡ Super easy to extend: Production vitamins added to a good juice: [mcp-go](https://github.com/mark3labs/mcp-go)
+
 
 ## Deployment
 
