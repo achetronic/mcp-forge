@@ -1,4 +1,4 @@
-package handlers
+package tools
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-func (h *HandlersManager) HandleToolWhoami(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tm *ToolsManager) HandleToolWhoami(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 
-	validatedJwt := request.Header.Get(h.dependencies.AppCtx.Config.Middleware.JWT.Validation.ForwardedHeader)
+	validatedJwt := request.Header.Get(tm.dependencies.AppCtx.Config.Middleware.JWT.Validation.ForwardedHeader)
 
 	if validatedJwt == "" {
 		return &mcp.CallToolResult{

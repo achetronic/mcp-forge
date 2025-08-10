@@ -38,11 +38,11 @@ func (tm *ToolsManager) AddTools() {
 			mcp.Description("Name of the person to greet"),
 		),
 	)
-	tm.dependencies.McpServer.AddTool(tool, tm.dependencies.HandlersManager.HandleToolHello)
+	tm.dependencies.McpServer.AddTool(tool, tm.HandleToolHello)
 
 	// 2. Describe and add another tool
 	tool = mcp.NewTool("whoami",
 		mcp.WithDescription("Expose information about the user"),
 	)
-	tm.dependencies.McpServer.AddTool(tool, tm.dependencies.HandlersManager.HandleToolWhoami)
+	tm.dependencies.McpServer.AddTool(tool, tm.HandleToolWhoami)
 }
