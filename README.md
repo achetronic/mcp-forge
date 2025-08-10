@@ -10,7 +10,7 @@ but with local providers like Claude Desktop too.
 
 ## Features
 
-- 🔐 **OAuth RFC 8414** compliant
+- 🔐 **OAuth RFC 8414 and RFC 9728 compliant**
   - Support for `.well-known/oauth-protected-resource` and `.well-known/oauth-authorization-server` endpoints
   - Both endpoints are configurable
 
