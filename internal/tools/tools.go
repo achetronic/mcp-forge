@@ -1,9 +1,9 @@
 package tools
 
 import (
-	"mcp-server-template/internal/globals"
-	"mcp-server-template/internal/handlers"
-	"mcp-server-template/internal/middlewares"
+	"mcp-forge/internal/globals"
+	"mcp-forge/internal/handlers"
+	"mcp-forge/internal/middlewares"
 
 	//
 	"github.com/mark3labs/mcp-go/mcp"

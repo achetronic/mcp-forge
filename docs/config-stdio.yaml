@@ -1,6 +1,6 @@
 # MCP Server Configuration
 server:
-  name: "MCP Server Template"
+  name: "MCP Forge"
   version: "0.1.0"
   transport:
     type: "stdio"

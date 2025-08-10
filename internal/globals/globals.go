@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"log/slog"
-	"mcp-server-template/api"
-	"mcp-server-template/internal/config"
+	"mcp-forge/api"
+	"mcp-forge/internal/config"
 	"os"
 )
 

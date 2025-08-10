@@ -1,4 +1,4 @@
-module mcp-server-template
+module mcp-forge
 
 go 1.24
 

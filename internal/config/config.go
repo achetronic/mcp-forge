@@ -1,7 +1,7 @@
 package config
 
 import (
-	"mcp-server-template/api"
+	"mcp-forge/api"
 	"os"
 
 	"gopkg.in/yaml.v3"

@@ -6,10 +6,10 @@ import (
 	"time"
 
 	//
-	"mcp-server-template/internal/globals"
-	"mcp-server-template/internal/handlers"
-	"mcp-server-template/internal/middlewares"
-	"mcp-server-template/internal/tools"
+	"mcp-forge/internal/globals"
+	"mcp-forge/internal/handlers"
+	"mcp-forge/internal/middlewares"
+	"mcp-forge/internal/tools"
 
 	//
 	"github.com/mark3labs/mcp-go/server"

@@ -1,6 +1,6 @@
 # MCP Server Configuration
 server:
-  name: "MCP Server Template"
+  name: "MCP Forge"
   version: "0.1.0"
   transport:
     type: "http"
@@ -44,7 +44,7 @@ oauth_authorization_server:
 # Endpoint: /.well-known/oauth-protected-resource
 oauth_protected_resource:
   enabled: true
-  resource: "https://mcp-server-template.example.com"
+  resource: "https://mcp-forge.example.com"
   auth_servers:
     - "https://keycloak.example.com/realms/mcp-servers"
   jwks_uri: *JwksUri
@@ -53,7 +53,7 @@ oauth_protected_resource:
     - profile
     - email
     - groups
-    - mcp-server-template/custom-audience
+    - mcp-forge/custom-audience
 
   # Optional parameters (currently empty)
   bearer_methods_supported: []

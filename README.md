@@ -1,4 +1,4 @@
-# MCP Server Template
+# MCP Forge
 
 ## Description
 A production-ready MCP (Model Context Protocol) server template (oauth authorization included) built in Go that works with major AI providers.
@@ -95,10 +95,10 @@ make build
 {
   "mcpServers": {
     "stdio": {
-      "command": "/home/example/mcp-server-template/bin/mcp-server-template-linux-amd64",
+      "command": "/home/example/mcp-forge/bin/mcp-forge-linux-amd64",
       "args": [
         "--config",
-        "/home/example/mcp-server-template/docs/config-stdio.yaml"
+        "/home/example/mcp-forge/docs/config-stdio.yaml"
       ]
     }
   }
@@ -164,9 +164,9 @@ Do you feel for reading about this topic? I gave you the advice, then don't comp
 
 All contributions are welcome! Whether you're reporting bugs, suggesting features, or submitting code — thank you! Here’s how to get involved:
 
-▸ [Open an issue](https://github.com/achetronic/mcp-server-template/issues/new) to report bugs or request features
+▸ [Open an issue](https://github.com/achetronic/mcp-forge/issues/new) to report bugs or request features
 
-▸ [Submit a pull request](https://github.com/achetronic/mcp-server-template/pulls) to contribute improvements
+▸ [Submit a pull request](https://github.com/achetronic/mcp-forge/pulls) to contribute improvements
 
 
 ## 📄 License

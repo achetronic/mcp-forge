@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"mcp-server-template/internal/globals"
+	"mcp-forge/internal/globals"
 	"net/http"
 	"time"
 )

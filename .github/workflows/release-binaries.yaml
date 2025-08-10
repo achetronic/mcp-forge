@@ -71,7 +71,7 @@ jobs:
         run: |
           export GOOS=${{ matrix.goos }}
           export GOARCH=${{ matrix.goarch }}
-          export PACKAGE_NAME=mcp-server-template-${{ steps.read_tag.outputs.release_tag }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
+          export PACKAGE_NAME=mcp-forge-${{ steps.read_tag.outputs.release_tag }}-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
 
           make package
           make package-signature

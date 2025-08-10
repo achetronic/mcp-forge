@@ -22,7 +22,7 @@ app-template:
       containers:
         main:
           image:
-            repository: ghcr.io/achetronic/mcp-server-template
+            repository: ghcr.io/achetronic/mcp-forge
             tag: latest
             pullPolicy: Always
 
@@ -50,7 +50,7 @@ app-template:
         config.yaml: |
           # MCP Server Configuration
           server:
-            name: "MCP Server Template"
+            name: "MCP Forge"
             version: "0.1.0"
             transport:
               type: "http"
@@ -95,7 +95,7 @@ app-template:
           # Endpoint: /.well-known/oauth-protected-resource
           oauth_protected_resource:
             enabled: true
-            resource: "https://mcp-server-template.example.com"
+            resource: "https://mcp-forge.example.com"
             auth_servers:
               - "https://keycloak.example.com/realms/mcp-servers"
             jwks_uri: *JwksUri
@@ -104,7 +104,7 @@ app-template:
               - profile
               - email
               - groups
-              - mcp-server-template/custom-audience
+              - mcp-forge/custom-audience
           
             # Optional parameters (currently empty)
             bearer_methods_supported: []
@@ -157,7 +157,7 @@ app-template:
           data:
             - secretKey: PLACEHOLDER
               remoteRef:
-                key: your-kv/applications/mcp-server-template/credentials
+                key: your-kv/applications/mcp-forge/credentials
                 property: username
 
     public-api-entrance:
@@ -167,7 +167,7 @@ app-template:
       spec:
         spec:
           hostnames:
-            - mcp-server-template.example.com
+            - mcp-forge.example.com
           parentRefs:
             - group: gateway.networking.k8s.io
               kind: Gateway
@@ -178,7 +178,7 @@ app-template:
             - backendRefs: &mainBackendRef
                 - group: ""
                   kind: Service
-                  name: mcp-server-template
+                  name: mcp-forge
                   port: 8080
                   weight: 1
               matches:
@@ -197,7 +197,7 @@ app-template:
         spec:
           workloadSelector:
             labels:
-              app.kubernetes.io/name: mcp-server-template
+              app.kubernetes.io/name: mcp-forge
           configPatches:
             - applyTo: NETWORK_FILTER
               match:
@@ -223,7 +223,7 @@ app-template:
         spec:
           selector:
             matchLabels:
-              app.kubernetes.io/name: mcp-server-template
+              app.kubernetes.io/name: mcp-forge
 
           action: DENY
           rules:
@@ -256,7 +256,7 @@ app-template:
         spec:
           selector:
             matchLabels:
-              app.kubernetes.io/name: mcp-server-template
+              app.kubernetes.io/name: mcp-forge
           jwtRules:
             - forwardOriginalToken: true
               outputPayloadToHeader: X-Validated-Jwt
@@ -271,7 +271,7 @@ app-template:
         spec:
           selector:
             matchLabels:
-              app.kubernetes.io/name: mcp-server-template
+              app.kubernetes.io/name: mcp-forge
           action: DENY
           rules:
             - to:
@@ -285,4 +285,4 @@ app-template:
                     - https://keycloak.example.com/realms/mcp-servers
                 - key: request.auth.audiences
                   notValues:
-                    - https://mcp-server-template.example.com
+                    - https://mcp-forge.example.com

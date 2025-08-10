@@ -1,6 +1,6 @@
 package handlers
 
-import "mcp-server-template/internal/globals"
+import "mcp-forge/internal/globals"
 
 type HandlersManagerDependencies struct {
 	AppCtx *globals.ApplicationContext

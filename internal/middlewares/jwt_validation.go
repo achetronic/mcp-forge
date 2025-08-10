@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	//
-	"mcp-server-template/internal/globals"
+	"mcp-forge/internal/globals"
 
 	//
 	"github.com/google/cel-go/cel"
