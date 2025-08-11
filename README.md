@@ -83,6 +83,9 @@ This project is fully ready for dealing with Claude Web with zero effort in your
 
 In general, if you follow our recommendations on production, all the remote clients are covered 😊
 
+> [!NOTE]  
+> Hey! look at the configuration [here](./docs/config-http.yaml)
+
 #### 💻 Local Clients (Claude Desktop, Cursor, VSCode)
 
 Local clients configuration is commonly based in a JSON file with a specific standard structure. For example,
