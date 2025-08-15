@@ -187,4 +187,4 @@ All contributions are welcome! Whether you're reporting bugs, suggesting feature
 
 ## 📄 License
 
-Admitik is licensed under the [Apache 2.0 License](./LICENSE).
+MCP Forge is licensed under the [Apache 2.0 License](./LICENSE).
