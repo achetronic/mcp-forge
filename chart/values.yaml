@@ -88,6 +88,10 @@ app-template:
           oauth_authorization_server:
             enabled: true
           
+            # A suffix can be attached to the URL using following param as follows:
+            # It will produce: /.well-known/oauth-authorization-server{url_suffix}
+            # url_suffix: "/mcp"
+          
             # Following path will be attached: /.well-known/openid-configuration
             issuer_uri: "https://keycloak.example.com/realms/mcp-servers"
     
@@ -95,7 +99,12 @@ app-template:
           # Endpoint: /.well-known/oauth-protected-resource
           oauth_protected_resource:
             enabled: true
-            resource: "https://mcp-forge.example.com"
+          
+            # A suffix can be attached to the URL using following param as follows:
+            # It will produce: /.well-known/oauth-protected-resource{url_suffix}
+            # url_suffix: "/mcp"
+          
+            resource: "https://mcp-forge.example.com/mcp"
             auth_servers:
               - "https://keycloak.example.com/realms/mcp-servers"
             jwks_uri: *JwksUri
