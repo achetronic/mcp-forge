@@ -73,10 +73,20 @@ func (mw *JWTValidationMiddleware) Middleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
+		var resourceMetadataUrl string
+
 		if !mw.dependencies.AppCtx.Config.Middleware.JWT.Enabled {
 			goto nextStage
 		}
 
+		// Add WWW-Authenticate header just in case is needed.
+		// Will be cleared for authorized requests later.
+		resourceMetadataUrl = fmt.Sprintf("%s://%s/.well-known/oauth-protected-resource%s",
+			getRequestScheme(req), req.Host, mw.dependencies.AppCtx.Config.OAuthProtectedResource.UrlSuffix)
+		
+		rw.Header().Set("WWW-Authenticate", `Bearer realm="mcp", resource_metadata="`+resourceMetadataUrl+`"`)
+
+		//
 		switch mw.dependencies.AppCtx.Config.Middleware.JWT.Validation.Strategy {
 		case "local":
 			// 1. Extract token from header
@@ -142,6 +152,7 @@ func (mw *JWTValidationMiddleware) Middleware(next http.Handler) http.Handler {
 		}
 
 	nextStage:
+		rw.Header().Del("WWW-Authenticate")
 		next.ServeHTTP(rw, req)
 	})
 }

@@ -60,12 +60,16 @@ type MiddlewareConfig struct {
 // OAuthAuthorizationServer represents the OAuth Authorization Server configuration
 type OAuthAuthorizationServer struct {
 	Enabled   bool   `yaml:"enabled"`
+	UrlSuffix string `yaml:"url_suffix,omitempty"`
+
 	IssuerUri string `yaml:"issuer_uri"`
 }
 
 // OAuthProtectedResourceConfig represents the OAuth Protected Resource configuration
 type OAuthProtectedResourceConfig struct {
-	Enabled                               bool     `yaml:"enabled"`
+	Enabled   bool   `yaml:"enabled"`
+	UrlSuffix string `yaml:"url_suffix,omitempty"`
+
 	Resource                              string   `yaml:"resource"`
 	AuthServers                           []string `yaml:"auth_servers"`
 	JWKSUri                               string   `yaml:"jwks_uri"`
