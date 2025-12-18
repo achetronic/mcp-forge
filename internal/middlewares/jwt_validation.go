@@ -73,7 +73,8 @@ func (mw *JWTValidationMiddleware) Middleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
-		var resourceMetadataUrl string
+		var wwwAuthResourceMetadataUrl string
+		var wwwAuthScope string
 
 		if !mw.dependencies.AppCtx.Config.Middleware.JWT.Enabled {
 			goto nextStage
@@ -81,10 +82,15 @@ func (mw *JWTValidationMiddleware) Middleware(next http.Handler) http.Handler {
 
 		// Add WWW-Authenticate header just in case is needed.
 		// Will be cleared for authorized requests later.
-		resourceMetadataUrl = fmt.Sprintf("%s://%s/.well-known/oauth-protected-resource%s",
+		// Ref: https://modelcontextprotocol.io/specification/draft/basic/authorization
+		wwwAuthResourceMetadataUrl = fmt.Sprintf("%s://%s/.well-known/oauth-protected-resource%s",
 			getRequestScheme(req), req.Host, mw.dependencies.AppCtx.Config.OAuthProtectedResource.UrlSuffix)
-		
-		rw.Header().Set("WWW-Authenticate", `Bearer realm="mcp", resource_metadata="`+resourceMetadataUrl+`"`)
+		wwwAuthScope = strings.Join(mw.dependencies.AppCtx.Config.OAuthProtectedResource.ScopesSupported, " ")
+
+		rw.Header().Set("WWW-Authenticate",
+			`Bearer error="insufficient_scope", 
+						  resource_metadata="`+wwwAuthResourceMetadataUrl+`", 
+						  scope="`+wwwAuthScope+`"`)
 
 		//
 		switch mw.dependencies.AppCtx.Config.Middleware.JWT.Validation.Strategy {
