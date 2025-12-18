@@ -88,7 +88,7 @@ func (mw *JWTValidationMiddleware) Middleware(next http.Handler) http.Handler {
 		wwwAuthScope = strings.Join(mw.dependencies.AppCtx.Config.OAuthProtectedResource.ScopesSupported, " ")
 
 		rw.Header().Set("WWW-Authenticate",
-			`Bearer error="insufficient_scope", 
+			`Bearer error="invalid_token", 
 						  resource_metadata="`+wwwAuthResourceMetadataUrl+`", 
 						  scope="`+wwwAuthScope+`"`)
 
